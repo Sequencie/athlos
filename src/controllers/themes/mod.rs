@@ -44,7 +44,7 @@ pub async fn get(query: String) -> Result<Response, Rejection> {
     let pattern = format!(".*{}.*", query);
     let re = mongodb::bson::Regex{
         pattern: pattern,
-        options: String::new()
+        options: String::from("i")
     };
     let filter: Document = doc! {"name": re};
     let search_results = service.get(filter).await;

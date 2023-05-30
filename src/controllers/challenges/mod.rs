@@ -61,7 +61,7 @@ pub async fn search(search_query:String) -> Result<Response, Rejection> {
     let pattern = format!(".*{}*.", search_query);
     let re = mongodb::bson::Regex{
         pattern: pattern,
-        options: String::new()
+        options: String::from("i")
     };
     // create filter and return search results.
     let filter: Document = doc!{"name": re};
