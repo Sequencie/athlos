@@ -76,10 +76,8 @@ pub async fn update(session_id: String, updates: SessionUpdate) -> Result<Respon
     // Create a service.
     let service: Service = Service::new().await;
     let filter: Document = doc! { "_id": ObjectId::parse_str(session_id).expect("CS2-0") };
-    println!("{}", filter);
     let update_document = mongodb::bson::to_document(&updates).expect("CS2-1");
     let modified_update_document = doc! {"$set": update_document};
-    println!("{}", modified_update_document);
     let update_result = service.update(filter, modified_update_document).await;
     // Commit the update.
     let response_data = Option::from(serde_json::to_string(&update_result).unwrap());
