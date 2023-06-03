@@ -37,4 +37,6 @@ impl Challenge {
         let results: Vec<Model> = cursor.try_collect().await.expect("ST0-2");
         return results;
     }
+
+
 }
