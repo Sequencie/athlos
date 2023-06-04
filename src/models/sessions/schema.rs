@@ -38,3 +38,7 @@ pub struct PlayerUpdate {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_host: Option<bool>
 }
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct RevokeInvite {
+    pub player_id: String
+}

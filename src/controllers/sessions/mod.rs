@@ -12,7 +12,7 @@ use bson::oid::ObjectId;
 /// Custom crates
 use crate::services::sessions::Sessions as Service;
 use crate::models::sessions::schema::{Session as Model, SessionUpdate};
-use crate::models::sessions::schema::Player;
+use crate::models::sessions::schema::{Player, PlayerUpdate, RevokeInvite};
 use crate::helpers::reply::{reply_helper, create_json_response, create_serde_response};
 
 #[derive(Deserialize)]
@@ -71,7 +71,7 @@ pub async fn get(query_params: QueryParams) -> Result<Response, Rejection> {
     return Ok(response);
 }
 
-// Update action
+/// Update action
 pub async fn update(session_id: String, updates: SessionUpdate) -> Result<Response, Rejection> {
     // Create a service.
     let service: Service = Service::new().await;
@@ -89,4 +89,57 @@ pub async fn update(session_id: String, updates: SessionUpdate) -> Result<Respon
     let response_body = create_serde_response(false, "Update was a success", response_data, None);
     let response = reply_helper(response_body, StatusCode::OK);
     return Ok(response)
+}
+
+/// Invite action.
+pub async fn invite(session_id: String, mut updates: PlayerUpdate) -> Result<Response, Rejection> {
+    // Create a service.
+    let service: Service = Service::new().await;
+
+    // Create a new ObjectId to give the new player.
+    let object_id = ObjectId::new();
+    updates._id = Option::from(object_id);
+
+    // Define the filter.
+    let filter: Document = doc! { "_id": ObjectId::parse_str(session_id).expect("CS3-0") };
+    let update_document = mongodb::bson::to_document(&updates).expect("CS3-1");
+    let modified_update_document = doc! {"$push": {"players": update_document}};
+    println!("{}", modified_update_document);
+    let update_result = service.update(filter, modified_update_document).await;
+
+    // Commit the update.
+    let response_data = Option::from(serde_json::to_string(&update_result).unwrap());
+    if update_result.modified_count == 0 {
+        let response_body = create_json_response(true, "Update didn't work", None, Option::from("CS3-3"));
+        return Ok(reply_helper(response_body, StatusCode::BAD_REQUEST))
+    }
+
+    // Return a response.
+    let response_body = create_serde_response(false, "Update was a success", response_data, None);
+    let response = reply_helper(response_body, StatusCode::OK);
+    return Ok(response)
+}
+
+/// Revoke action.
+pub async fn revoke(session_id: String, updates: RevokeInvite) -> Result<Response, Rejection> {
+    // Create a service.
+    let service: Service = Service::new().await;
+
+    // Create the filter and update body.
+    let filter: Document = doc! { "_id": ObjectId::parse_str(session_id).expect("CS3-0") };
+    let modified_update_document =  doc! {"$pull": { "players": {"player_id": updates.player_id } }};
+        println!("{}", modified_update_document);
+    let update_result = service.update(filter, modified_update_document).await;
+
+    // Commit the update.
+    let response_data = Option::from(serde_json::to_string(&update_result).unwrap());
+        if update_result.modified_count == 0 {
+            let response_body = create_json_response(true, "Update didn't work", None, Option::from("CS3-3"));
+            return Ok(reply_helper(response_body, StatusCode::BAD_REQUEST))
+        }
+
+    // Return a response.
+    let response_body = create_serde_response(false, "Update was a success", response_data, None);
+        let response = reply_helper(response_body, StatusCode::OK);
+        return Ok(response)
 }
