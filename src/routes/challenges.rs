@@ -1,5 +1,4 @@
 /// Custom crates
-
 use crate::models::challenges::Challenge;
 use crate::controllers::challenges;
 

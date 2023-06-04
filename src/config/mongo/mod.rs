@@ -1,4 +1,4 @@
-use mongodb::{Client, Database, options::ClientOptions};
+use mongodb::{Client, Database};
 use dotenv::dotenv;
 
 pub struct MongoConfig{
@@ -20,6 +20,6 @@ impl MongoConfig {
     }
 
     pub fn get_database(&self) -> Database {
-        self.client.database("authentication")
+        self.client.database("game_engine")
     }
 }

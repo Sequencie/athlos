@@ -990,6 +990,7 @@ name = "game_engine"
 version = "0.1.0"
 dependencies = [
  "async-std",
+ "bson",
  "cargo-watch",
  "dotenv",
  "env_logger",

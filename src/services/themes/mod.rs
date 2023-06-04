@@ -3,7 +3,7 @@
 use mongodb::{Collection, Cursor};
 use futures::stream::TryStreamExt;
 use mongodb::options::FindOptions;
-use mongodb::bson::{Document};
+use mongodb::bson::Document;
 use mongodb::results::InsertOneResult;
 
 // Custom crates.
