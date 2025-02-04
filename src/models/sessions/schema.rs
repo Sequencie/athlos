@@ -1,8 +1,7 @@
 use mongodb::bson::oid::ObjectId;
-use mongodb::options::UpdateModifications;
-use validator::{Validate, ValidationError, ValidationErrors};
-use serde::{Serialize, Deserialize, Serializer};
+use serde::{Serialize, Deserialize};
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Approval {
     Requested,
     Denied,
@@ -36,7 +35,10 @@ pub struct SessionUpdate{
     pub location: Option<String>,
     
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_current: Option<bool>
+    pub is_current: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub approval: Option<Approval>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

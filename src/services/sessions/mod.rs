@@ -7,7 +7,7 @@ use mongodb::results::{InsertOneResult, UpdateResult};
 use mongodb::bson::oid::ObjectId;
 
 /// Custom crates.
-use crate::models::sessions::schema::{Session as SessionModel};
+use crate::models::sessions::schema::Session as SessionModel;
 use crate::config::mongo;
 
 pub struct Sessions {
