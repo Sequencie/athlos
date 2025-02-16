@@ -11,9 +11,12 @@ use crate::config::mongo;
 use crate::models::themes::Theme as ThemeModel;
 
 /// Base structure.
+
 pub struct Theme {
     collection: Collection<ThemeModel>
 }
+
+// impl IntoJSON
 
 impl Theme {
 

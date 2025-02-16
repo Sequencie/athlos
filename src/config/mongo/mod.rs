@@ -15,11 +15,7 @@ impl MongoConfig {
         }
     }
 
-    pub fn get_client(&self) -> &Client {
-        &self.client
-    }
-
     pub fn get_database(&self) -> Database {
-        self.client.database("game_engine")
+        self.client.database("athlos")
     }
 }

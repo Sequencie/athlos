@@ -5,7 +5,8 @@ use validator::{Validate, ValidationError, ValidationErrors};
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Theme {
     pub _id: Option<ObjectId>,
-    pub name: String
+    pub name: String,
+    pub image: String
 }
 
 impl Validate for Theme {
@@ -13,6 +14,9 @@ impl Validate for Theme {
         let mut errors: ValidationErrors = ValidationErrors::new();
         if self.name.is_empty() {
             errors.add("Name", ValidationError::new("A name for the theme was not provided"))
+        }
+        if self.name.is_empty() {
+            errors.add("Image", ValidationError::new("An image for the theme was not provided"))
         }
         if errors.is_empty() { Ok(()) } else { Err(errors) }
     }
