@@ -1,5 +1,12 @@
-/* */
-/// Core crates
+/*
+ * @description This is a controller module for the sessions resource.
+ * @author @0verwtch
+ */
+
+
+/*
+ * Core crates. 
+ **/
 use json::object;
 use mongodb::bson::{doc, Document};
 use serde_json;
@@ -10,7 +17,9 @@ use warp::reply::Response;
 use warp::Rejection;
 use serde::Serialize;
 
-/// Custom crates
+/*
+ * Custom crates. 
+ **/
 use crate::helpers::reply::reply_helper;
 use crate::models::themes::Theme as ThemeModel;
 use crate::services::themes::Theme;

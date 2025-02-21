@@ -1,9 +1,17 @@
-// Core crates.
+/*
+ * @description This is a rounte module for the sessions resource.
+ * @author @0verwtch
+ **/
+
+/*
+ * Core crates. 
+ **/
 use warp::Filter;
 
-// Custom crates.
+/*
+ * Custom crates. 
+ **/
 use crate::controllers::sessions;
-use crate::controllers::sessions::QueryParams;
 use crate::models::sessions::schema::{Session, SessionUpdate, PlayerUpdate, RevokeInvite};
 
 pub fn routes () -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
@@ -14,10 +22,9 @@ pub fn routes () -> impl Filter<Extract = impl warp::Reply, Error = warp::Reject
                  .and_then(move |session: Session| async {sessions::create(session).await})
                  .with(warp::log("api"));
     // Get endpoint
-    let get = warp::path!("sessions" / "get" / "player")
+    let get = warp::path!("sessions" / "get" / "player" / String / bool)
                 .and(warp::get())
-                .and(warp::query().map(move |search_query: QueryParams| search_query))
-                .and_then(move |query_params: QueryParams| async { sessions::get(query_params).await })
+                .and_then(move |player_id: String, is_current: bool| async move { sessions::get(player_id, is_current).await })
                 .with(warp::log("api"));
     // Update endpoint
     let update = warp::path!("sessions" / "update" / "session" / String)

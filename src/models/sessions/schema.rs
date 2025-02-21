@@ -22,9 +22,10 @@ pub struct Session {
     pub _id: Option<ObjectId>,
     pub players: Vec<Player>,
     pub location: String,
-    pub is_current: bool,
-    pub approval: Approval
+    pub is_current: Option<bool>,
+    pub approval: Option<Approval>
 }
+
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct SessionUpdate{

@@ -1,72 +1,82 @@
-/// Core crates
+/*
+ * @description This is a controller module for the sessions resource.
+ * @author @0verwtch
+ */
+
+/*
+ * Core crates. 
+ **/
 use warp::Rejection;
-use warp::reply::Response;
-use warp::hyper::Body;
-use warp::http::StatusCode;
+use bson::oid::ObjectId;
+use json::object;
 use mongodb::bson::{doc, Document};
 use validator::Validate;
-use json::object;
-use serde::Deserialize;
-use bson::oid::ObjectId;
+use warp::http::StatusCode;
+use warp::hyper::Body;
+use warp::reply::Response;
 
-/// Custom crates
-use crate::services::sessions::Sessions as Service;
-use crate::models::sessions::schema::{Session as Model, SessionUpdate};
+/*
+ * Custom crates. 
+ **/
+use crate::helpers::reply::{create_json_response, create_serde_response, reply_helper};
 use crate::models::sessions::schema::{Player, PlayerUpdate, RevokeInvite};
-use crate::helpers::reply::{reply_helper, create_json_response, create_serde_response};
-
-#[derive(Deserialize)]
-pub struct QueryParams {
-    player: String,
-    is_current: bool
-}
+use crate::models::sessions::schema::{Session as Model, SessionUpdate};
+use crate::services::sessions::Sessions as Service;
 
 /// Create action.
 pub async fn create(session: Model) -> Result<Response, Rejection> {
     // Run validation
     let validate_errors = Model::validate(&session);
     if let Err(err) = validate_errors {
-        let response = reply_helper(Body::from(format!("CS0-0: {}", err)), StatusCode::UNPROCESSABLE_ENTITY);
+        let response = reply_helper(
+            Body::from(format!("CS0-0: {}", err)),
+            StatusCode::UNPROCESSABLE_ENTITY,
+        );
         return Ok(response);
     }
 
     // Initialize services and isolate the host.
-    let service:Service = Service::new().await;
+    let service: Service = Service::new().await;
     let host = session
-    .players.iter()
-    .filter(|player| player.is_host == true).collect::<Vec<&Player>>()
-    .pop().expect("CS0-0");
+        .players
+        .iter()
+        .filter(|player| player.is_host == true)
+        .collect::<Vec<&Player>>()
+        .pop()
+        .expect("CS0-0");
     // Check for duplicates with a filter
-    let filter:Document = doc!{"$and":[{"players.player_id": &host.player_id}, {"is_current": true}]};
+    let filter: Document =
+        doc! {"$and":[{"players.player_id": &host.player_id}, {"is_current": true}]};
     let duplicates = service.get(filter).await;
     if duplicates.len() > 0 {
-        let response_body = create_json_response(true, "Duplicates were found", None, Option::from("CS0-1"));
+        let response_body =
+            create_json_response(true, "Duplicates were found", None, Option::from("CS0-1"));
         let response = reply_helper(response_body, StatusCode::BAD_REQUEST);
         return Ok(response);
     }
     // Create the session and return a response.
     let created = service.create(session).await;
-    let response_data = Option::from(object!{"session": created.inserted_id.to_string()});
+    let response_data = Option::from(object! {"session": created.inserted_id.to_string()});
     let response_body = create_json_response(false, "Session created", response_data, None);
     let response = reply_helper(response_body, StatusCode::CREATED);
     return Ok(response);
 }
 
 /// Get action.
-pub async fn get(query_params: QueryParams) -> Result<Response, Rejection> {
+pub async fn get(player_id: String, is_current: bool) -> Result<Response, Rejection> {
     // create a service.
     let service: Service = Service::new().await;
-    let player = &query_params.player;
-    let is_current = &query_params.is_current;
-    let filter: Document = doc! { "$and": [{"players.player_id": player}, {"is_current": is_current}] };
+    let filter: Document =
+        doc! { "$and": [{"players.player_id": player_id}, {"is_current": is_current}] };
     let results = service.get(filter).await;
     if results.is_empty() {
-        let response_body = create_json_response(true, "No such session", None, Option::from("CS1-0"));
+        let response_body =
+            create_json_response(true, "No such session", None, Option::from("CS1-0"));
         return Ok(reply_helper(response_body, StatusCode::NOT_FOUND));
     }
     // Return a response.
     let response_data = Option::from(serde_json::to_string(&results).expect("CS1-1"));
-    let response_body = create_serde_response(false, "Sessions obtained", response_data , None);
+    let response_body = create_serde_response(false, "Sessions obtained", response_data, None);
     let response = reply_helper(response_body, StatusCode::OK);
     return Ok(response);
 }
@@ -82,13 +92,14 @@ pub async fn update(session_id: String, updates: SessionUpdate) -> Result<Respon
     // Commit the update.
     let response_data = Option::from(serde_json::to_string(&update_result).unwrap());
     if update_result.modified_count == 0 {
-        let response_body = create_json_response(true, "Update didn't work", None, Option::from("CS2-2"));
-        return Ok(reply_helper(response_body, StatusCode::BAD_REQUEST))
+        let response_body =
+            create_json_response(true, "Update didn't work", None, Option::from("CS2-2"));
+        return Ok(reply_helper(response_body, StatusCode::BAD_REQUEST));
     }
     // Return a response.
     let response_body = create_serde_response(false, "Update was a success", response_data, None);
     let response = reply_helper(response_body, StatusCode::OK);
-    return Ok(response)
+    return Ok(response);
 }
 
 /// Invite action.
@@ -110,14 +121,15 @@ pub async fn invite(session_id: String, mut updates: PlayerUpdate) -> Result<Res
     // Commit the update.
     let response_data = Option::from(serde_json::to_string(&update_result).unwrap());
     if update_result.modified_count == 0 {
-        let response_body = create_json_response(true, "Update didn't work", None, Option::from("CS3-3"));
-        return Ok(reply_helper(response_body, StatusCode::BAD_REQUEST))
+        let response_body =
+            create_json_response(true, "Update didn't work", None, Option::from("CS3-3"));
+        return Ok(reply_helper(response_body, StatusCode::BAD_REQUEST));
     }
 
     // Return a response.
     let response_body = create_serde_response(false, "Update was a success", response_data, None);
     let response = reply_helper(response_body, StatusCode::OK);
-    return Ok(response)
+    return Ok(response);
 }
 
 /// Revoke action.
@@ -127,19 +139,20 @@ pub async fn revoke(session_id: String, updates: RevokeInvite) -> Result<Respons
 
     // Create the filter and update body.
     let filter: Document = doc! { "_id": ObjectId::parse_str(session_id).expect("CS3-0") };
-    let modified_update_document =  doc! {"$pull": { "players": {"player_id": updates.player_id } }};
-        println!("{}", modified_update_document);
+    let modified_update_document = doc! {"$pull": { "players": {"player_id": updates.player_id } }};
+    println!("{}", modified_update_document);
     let update_result = service.update(filter, modified_update_document).await;
 
     // Commit the update.
     let response_data = Option::from(serde_json::to_string(&update_result).unwrap());
-        if update_result.modified_count == 0 {
-            let response_body = create_json_response(true, "Update didn't work", None, Option::from("CS3-3"));
-            return Ok(reply_helper(response_body, StatusCode::BAD_REQUEST))
-        }
+    if update_result.modified_count == 0 {
+        let response_body =
+            create_json_response(true, "Update didn't work", None, Option::from("CS3-3"));
+        return Ok(reply_helper(response_body, StatusCode::BAD_REQUEST));
+    }
 
     // Return a response.
     let response_body = create_serde_response(false, "Update was a success", response_data, None);
-        let response = reply_helper(response_body, StatusCode::OK);
-        return Ok(response)
+    let response = reply_helper(response_body, StatusCode::OK);
+    return Ok(response);
 }

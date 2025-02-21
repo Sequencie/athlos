@@ -1,4 +1,12 @@
-/// Core crates.
+/*
+ * @description This is a controller module for the sessions resource.
+ * @author @0verwtch
+ */
+
+/*
+ * Core crates. 
+ **/
+
 use mongodb::{Collection, Cursor, options::UpdateOptions};
 use futures::stream::TryStreamExt;
 use mongodb::options::FindOptions;
@@ -6,8 +14,11 @@ use mongodb::bson::Document;
 use mongodb::results::{InsertOneResult, UpdateResult};
 use mongodb::bson::oid::ObjectId;
 
-/// Custom crates.
-use crate::models::sessions::schema::Session as SessionModel;
+/*
+ * Custom crates. 
+ **/
+
+use crate::models::sessions::schema::{Approval, Session as SessionModel};
 use crate::config::mongo;
 
 pub struct Sessions {
@@ -30,7 +41,8 @@ impl Sessions {
             player._id = Option::from(ObjectId::new());
         }
         session._id = object_id;
-        session.is_current = true;
+        session.is_current = Some(true);
+        session.approval = Some(Approval::Requested);
         let insert_result: InsertOneResult = self.collection.insert_one(session, None).await.expect("SS0-0");
         return insert_result;
     }

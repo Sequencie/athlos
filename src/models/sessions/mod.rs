@@ -1,6 +1,6 @@
 use validator::{Validate, ValidationError, ValidationErrors};
 pub mod schema;
-use crate::models::sessions::schema::{Session};
+use crate::models::sessions::schema::Session;
 
 impl Validate for Session {
     fn validate(&self) -> Result<(), ValidationErrors> {
