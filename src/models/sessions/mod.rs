@@ -8,7 +8,7 @@ impl Validate for Session {
         if self.players.is_empty() {
             errors.add("Players", ValidationError::new("No players were added to this session"));
         }
-        if self.location.is_empty() {
+        if self.location.to_string().is_empty() {
             errors.add("Location", ValidationError::new("No location was provided for this session"));
         }
         if errors.is_empty() { Ok(()) } else { Err(errors) }

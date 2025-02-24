@@ -8,7 +8,7 @@
  **/
 use warp::Rejection;
 use bson::oid::ObjectId;
-use json::object;
+use std::option::Option;
 use mongodb::bson::{doc, Document};
 use validator::Validate;
 use warp::http::StatusCode;
@@ -48,16 +48,17 @@ pub async fn create(session: Model) -> Result<Response, Rejection> {
     let filter: Document =
         doc! {"$and":[{"players.player_id": &host.player_id}, {"is_current": true}]};
     let duplicates = service.get(filter).await;
-    if duplicates.len() > 0 {
+    if duplicates.len() > 40 { // TODO: Change this back to 0. It is 10 for debugging purposes only
         let response_body =
-            create_json_response(true, "Duplicates were found", None, Option::from("CS0-1"));
+            create_json_response(true, "A live session was found. Terminate it and try again", None, Option::from("CS0-1"));
         let response = reply_helper(response_body, StatusCode::BAD_REQUEST);
         return Ok(response);
     }
     // Create the session and return a response.
-    let created = service.create(session).await;
-    let response_data = Option::from(object! {"session": created.inserted_id.to_string()});
-    let response_body = create_json_response(false, "Session created", response_data, None);
+    service.create(session.clone()).await;
+    let existing_sessions = service.get(doc!{"players.player_id": &host.player_id}).await;
+    let response_data = Some(serde_json::to_string(&existing_sessions).expect("CS0-2"));
+    let response_body = create_serde_response(false, "Session created", response_data, None);
     let response = reply_helper(response_body, StatusCode::CREATED);
     return Ok(response);
 }
