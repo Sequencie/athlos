@@ -1,0 +1,14 @@
+[Unit]
+Description=Game engine subservice
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/athlos
+Restart=always
+User=system
+WorkingDirectory=/usr/local/bin
+StandardOutput=journal
+StandardError=journal
+
+[install]
+WantedBy=multi-user.target
