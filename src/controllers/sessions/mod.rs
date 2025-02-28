@@ -67,16 +67,17 @@ pub async fn create(session: Model) -> Result<Response, Rejection> {
 pub async fn get(player_id: String, is_current: bool) -> Result<Response, Rejection> {
     // create a service.
     let service: Service = Service::new().await;
+    println!("Printing status {} {}", player_id, !is_current);
     let filter: Document =
-        doc! { "$and": [{"players.player_id": player_id}, {"is_current": is_current}] };
+        doc! { "$and": [{"players.player_id": ObjectId::parse_str(player_id).expect("CS1-0")}, {"is_current": is_current}] };
     let results = service.get(filter).await;
     if results.is_empty() {
         let response_body =
-            create_json_response(true, "No such session", None, Option::from("CS1-0"));
+            create_json_response(true, "No such session", None, Option::from("CS1-1"));
         return Ok(reply_helper(response_body, StatusCode::NOT_FOUND));
     }
     // Return a response.
-    let response_data = Option::from(serde_json::to_string(&results).expect("CS1-1"));
+    let response_data = Option::from(serde_json::to_string(&results).expect("CS1-2"));
     let response_body = create_serde_response(false, "Sessions obtained", response_data, None);
     let response = reply_helper(response_body, StatusCode::OK);
     return Ok(response);
