@@ -56,7 +56,7 @@ pub fn create_serde_response(
     data: Option<String>,
     error_code: Option<String>,
 ) -> Body {
-    let mut response_object = SerdeJsonResponse::default();
+    let response_object;
     if is_error {
         response_object = SerdeJsonResponse {
             status: "error".to_string(),

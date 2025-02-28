@@ -268,6 +268,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "athlos"
+version = "0.1.0"
+dependencies = [
+ "async-std",
+ "bson",
+ "cargo-watch",
+ "dotenv",
+ "env_logger",
+ "futures",
+ "hmac",
+ "json",
+ "jwt",
+ "mongodb",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tokio",
+ "validator",
+ "warp",
+]
+
+[[package]]
 name = "atomic-waker"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1115,29 +1138,6 @@ dependencies = [
  "pin-project-lite",
  "pin-utils",
  "slab",
-]
-
-[[package]]
-name = "game_engine"
-version = "0.1.0"
-dependencies = [
- "async-std",
- "bson",
- "cargo-watch",
- "dotenv",
- "env_logger",
- "futures",
- "hmac",
- "json",
- "jwt",
- "mongodb",
- "reqwest",
- "serde",
- "serde_json",
- "sha2",
- "tokio",
- "validator",
- "warp",
 ]
 
 [[package]]
