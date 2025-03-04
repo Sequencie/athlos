@@ -4,6 +4,7 @@
  * @author @0verwtch
  */
 
+use bson::DateTime;
 /*
  * Core crates. 
  **/
@@ -33,7 +34,10 @@ pub struct Session {
     pub location: ObjectId,
     pub is_current: Option<bool>,
     pub approval: Option<Approval>,
-    pub theme_id: ObjectId
+    pub theme_id: ObjectId,
+    pub price_id: String,
+    pub qty: u8,
+    pub date: DateTime
 }
 
 
@@ -54,7 +58,16 @@ pub struct SessionUpdate{
     pub approval: Option<Approval>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub theme_id: Option<ObjectId>
+    pub theme_id: Option<ObjectId>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub price_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub qty: Option<u8>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub date: Option<DateTime>
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
