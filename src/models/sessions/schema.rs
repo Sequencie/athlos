@@ -4,7 +4,8 @@
  * @author @0verwtch
  */
 
-use bson::DateTime;
+use chrono::{DateTime, Utc};
+
 /*
  * Core crates. 
  **/
@@ -37,7 +38,7 @@ pub struct Session {
     pub theme_id: ObjectId,
     pub price_id: String,
     pub qty: u8,
-    pub date: DateTime
+    pub date: DateTime<Utc>
 }
 
 
@@ -67,7 +68,7 @@ pub struct SessionUpdate{
     pub qty: Option<u8>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub date: Option<DateTime>
+    pub date: Option<DateTime<Utc>>
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
