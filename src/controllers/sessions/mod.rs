@@ -48,7 +48,7 @@ pub async fn create(session: Model) -> Result<Response, Rejection> {
     let filter: Document =
         doc! {"$and":[{"players.player_id": &host.player_id}, {"is_current": true}]};
     let duplicates = service.get(filter).await;
-    if duplicates.len() > 40 { // TODO: Change this back to 0. It is 10 for debugging purposes only
+    if duplicates.len() > 50 { // TODO: Change this back to 0. It is 10 for debugging purposes only
         let response_body =
             create_json_response(true, "A live session was found. Terminate it and try again", None, Option::from("CS0-1"));
         let response = reply_helper(response_body, StatusCode::BAD_REQUEST);
